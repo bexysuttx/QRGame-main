@@ -1,0 +1,28 @@
+server:
+  port: 80
+
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/qr_game
+    username: qr_game
+    password: qr_game
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        temp:
+          use_jdbc_metadata_defaults: false
+        default_schema: main
+logging:
+  level:
+    #    org:
+    #      springframework:
+    #        web: DEBUG
+    main: DEBUG
+  pattern:
+    file: "%d{dd.MM.YYYY HH:mm:ss:SSS} [%thread] %-5level %logger{36} %msg%n"
+  path: logs
+  file:
+    name: ${logging.path}/logs.log
