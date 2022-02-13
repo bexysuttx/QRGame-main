@@ -10,8 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
 
-import static com.kolomin.balansir.Config.ConfigHandler.defaultResource;
-import static com.kolomin.balansir.Config.ConfigHandler.thisHostPort;
+import static com.kolomin.balansir.Config.ConfigHandler.*;
 import static com.kolomin.balansir.Service.AdminService.*;
 
 @Controller
@@ -31,6 +30,11 @@ public class BalansirController {
     @RequestMapping("favicon.ico")////
     @ResponseBody////
    public void favicon() {}///
+
+    @GetMapping("/")
+    public String getIndexPage() {
+        return "redirect:"+urlFront;
+    }
 
     //////
     @GetMapping("/{path}")

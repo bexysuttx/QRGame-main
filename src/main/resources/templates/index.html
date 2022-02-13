@@ -13,7 +13,7 @@
 
         if ($.cookie('QRs') == null){
 <!--            alert('Впервые отсканировали QR-код на мероприятии');-->
-            $.cookie('QRs', qr + ",", { expires: 7 });
+            $.cookie('QRs', qr + ",", { expires: 1 / 1440 });
 <!--            alert('Сохранили кук QRs: ' + $.cookie('QRs'));-->
 
             $.ajax({
@@ -55,7 +55,7 @@
                     var first_resources = $.cookie('first_resources');
 <!--                    alert('first_resources ' + first_resources);-->
                     first_resources = first_resources.substring(0, first_resources.length - 1) + ',\"' + qr + '\": \"' + data + '\"}';
-                    $.cookie('first_resources', first_resources, { expires: 7 });
+                    $.cookie('first_resources', first_resources, { expires: 1 / 1440 });
 <!--                    alert('Обновили и сохранили кук first_resources: ' + $.cookie('first_resources'));-->
                     location.replace(data);
 <!--                    alert('Перешли по вн ресурсу из БД');-->

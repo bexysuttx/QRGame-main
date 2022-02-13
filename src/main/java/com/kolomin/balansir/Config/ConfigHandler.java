@@ -23,6 +23,7 @@ public class ConfigHandler {
     public static String beforeQRsPath;
     public static String defaultResource;
     public static Date defaultResourceDate;
+    public static String urlFront;
 
     public ConfigHandler() {
         readConfigFromfile();
@@ -42,5 +43,6 @@ public class ConfigHandler {
         beforeQRsPath = config.getAsJsonObject().get("beforeQRsPath").toString().substring(1,config.getAsJsonObject().get("beforeQRsPath").toString().length() - 1);
         defaultResource = config.getAsJsonObject().get("defaultResource").toString().substring(1,config.getAsJsonObject().get("defaultResource").toString().length() - 1);
         defaultResourceDate = new Date();
+        urlFront=config.getAsJsonObject().get("frontUrl").toString().substring(1,config.getAsJsonObject().get("frontUrl").toString().length()-1);
     }
 }

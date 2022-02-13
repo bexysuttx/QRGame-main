@@ -1,6 +1,8 @@
 {
-  "thisUrl": "http://localhost/",
+  "thisUrl": "https://qrga.me/",
   "thisUrl_comment": "Указываем путь, куда перенаправлять пользователя в QR-коде. На удаленном сервере надо прописать  https://домен",
+  "frontUrl": "http://qrga.me:3001/",
+  "frontUrlComment": "домен, где развернут ФРОНТ (с портом)",
   "QRsPath": "QRs/",
   "QRsPath_comment": "папка рядом с jar-ником. куда падают .png",
   "beforeQRsPath": "/root/qrgame/qrgame/Java/",
