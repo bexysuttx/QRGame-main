@@ -3,3 +3,4 @@ function goQR() {
     str.startsWith('/') ? str = str.slice(1) : str;
     window.location=location.href+str
    }
+
