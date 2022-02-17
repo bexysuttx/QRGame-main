@@ -8,6 +8,7 @@ import com.kolomin.balansir.Entity.PersonalPassword;
 import com.kolomin.balansir.Entity.QR;
 import com.kolomin.balansir.Entity.Resource;
 import com.kolomin.balansir.Model.QRPersonalAccessModel;
+import com.kolomin.balansir.Util.DataUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
@@ -92,7 +93,8 @@ public class AdminService {
      * Данный метод ищет в БД дубликаты на суффикс(хвост урла дл QR-кода)
      * На этот маппинг кидает запросы фронт каждые 0.5 сек, и если есть дубликаты - подсвечивает введенный пользователем хвост красным
      * */
-    public String searchSuffixInDB(String suffix, Long id) {
+    public String searchSuffixInDB(String path, Long id) {
+        String suffix = DataUtil.normalizeName(path);
         log.info("Запрос на сравнение суффикса " + suffix +" с БД");
 
         if (id == 0){
@@ -123,7 +125,8 @@ public class AdminService {
      * Данный метод ищет в БД дубликаты на внешний ресурс(урл до ботов например)
      * На этот маппинг кидает запросы фронт каждые 0.5 сек, и если есть дубликаты - подсвечивает введенный пользователем адрес красным
      * */
-    public String searchUrlInDB(String suffix, Long id) {
+    public String searchUrlInDB(String path, Long id) {
+        String suffix = DataUtil.normalizeName(path);
         log.info("Запрос на сравнение урла внешнего ресурса " + suffix + " с БД");
 //        if (resourceService.findUrl(suffix)){
 //            System.out.println("{\"exist\": " + true + "}");
@@ -217,12 +220,12 @@ public class AdminService {
 //        for (JsonElement qr: request.getAsJsonObject().get("QRs").getAsJsonArray()) {
         for (JsonElement qr: request.getAsJsonObject().get("qrs").getAsJsonArray()) {
             QR newQR = new QR();
-            if (qrService.existsByQRSuffix(qr.getAsJsonObject().get("qr_suffix").toString().replaceAll("\"",""))){
-                log.error(response += ",\"errorText\": \"Суффикс " + qr.getAsJsonObject().get("qr_suffix").toString().replaceAll("\"","") + " уже существует. Данный суффикс не добавился\",\n");
-                response += ",\"errorText\": \"Суффикс " + qr.getAsJsonObject().get("qr_suffix").toString().replaceAll("\"","") + " уже существует. Данный суффикс не добавился\",\n";
+            if (qrService.existsByQRSuffix(DataUtil.normalizeName(qr.getAsJsonObject().get("qr_suffix").toString().replaceAll("\"","")))){
+                log.error(response += ",\"errorText\": \"Суффикс " + DataUtil.normalizeName(qr.getAsJsonObject().get("qr_suffix").toString().replaceAll("\"","")) + " уже существует. Данный суффикс не добавился\",\n");
+                response += ",\"errorText\": \"Суффикс " + DataUtil.normalizeName(qr.getAsJsonObject().get("qr_suffix").toString().replaceAll("\"","")) + " уже существует. Данный суффикс не добавился\",\n";
                 continue;
             }
-            newQR.setQr_suffix(qr.getAsJsonObject().get("qr_suffix").toString().replaceAll("\"",""));
+            newQR.setQr_suffix(DataUtil.normalizeName(qr.getAsJsonObject().get("qr_suffix").toString().replaceAll("\"","")));
             newQR.setQr_url(thisHostPort + newQR.getQr_suffix());
             newQR.setEvent(newEvent);
             if (qr.getAsJsonObject().get("team").toString().equals("true")){
@@ -308,6 +311,7 @@ public class AdminService {
         }
 
         eventSevice.saveOrUpdate(newEvent);
+        statisticStart(newEvent.getId());
         log.debug("newEvent saved\n" + newEvent);
 
         return response += "}";
@@ -371,7 +375,7 @@ public class AdminService {
             if (!qr.getAsJsonObject().get("id").toString().replaceAll("\"", "").equals("add")) {  //  если существующий код
                 QR oldQR = qrService.getById(Long.valueOf(qr.getAsJsonObject().get("id").toString().replaceAll("\"", "")));
                 oldAndNewQrs.add(oldQR);
-                oldQR.setQr_suffix(qr.getAsJsonObject().get("qr_suffix").toString().replaceAll("\"", ""));
+                oldQR.setQr_suffix(DataUtil.normalizeName(qr.getAsJsonObject().get("qr_suffix").toString().replaceAll("\"", "")));
                 oldQR.setQr_url(thisHostPort + oldQR.getQr_suffix());
 //                oldQR.setEvent(oldEvent);
                 if (qr.getAsJsonObject().get("team").toString().replaceAll("\"", "").equals("true")) {
@@ -521,12 +525,12 @@ public class AdminService {
             }
             else {    //  если не существующий код
                 QR newQR = new QR();
-                if (qrService.existsByQRSuffix(qr.getAsJsonObject().get("qr_suffix").toString().replaceAll("\"",""))){
-                    log.error(response += ",\"errorText\": \"Суффикс " + qr.getAsJsonObject().get("qr_suffix").toString().replaceAll("\"","") + " уже существует. Данный суффикс не добавился\",\n");
-                    response += ",\"errorText\": \"Суффикс " + qr.getAsJsonObject().get("qr_suffix").toString().replaceAll("\"","") + " уже существует. Данный суффикс не добавился\",\n";
+                if (qrService.existsByQRSuffix(DataUtil.normalizeName(qr.getAsJsonObject().get("qr_suffix").toString().replaceAll("\"","")))){
+                    log.error(response += ",\"errorText\": \"Суффикс " + DataUtil.normalizeName(qr.getAsJsonObject().get("qr_suffix").toString().replaceAll("\"","")) + " уже существует. Данный суффикс не добавился\",\n");
+                    response += ",\"errorText\": \"Суффикс " + DataUtil.normalizeName(qr.getAsJsonObject().get("qr_suffix").toString().replaceAll("\"","")) + " уже существует. Данный суффикс не добавился\",\n";
                     continue;
                 }
-                newQR.setQr_suffix(qr.getAsJsonObject().get("qr_suffix").toString().replaceAll("\"",""));
+                newQR.setQr_suffix(DataUtil.normalizeName(qr.getAsJsonObject().get("qr_suffix").toString().replaceAll("\"","")));
                 newQR.setQr_url(thisHostPort + newQR.getQr_suffix());
                 newQR.setEvent(oldEvent);
                 if (qr.getAsJsonObject().get("team").toString().equals("true")){
@@ -650,6 +654,8 @@ public class AdminService {
 
         eventSevice.saveOrUpdate(oldEvent);
         log.debug("oldEvent saved\n" + oldEvent);
+        statisticStop(oldEvent.getId());
+        statisticStart(oldEvent.getId());
 
         return response += "}";
     }
@@ -807,8 +813,8 @@ public class AdminService {
     }
 
     public byte[] getImage(String qr_suffix) throws IOException {
-        QR qr = qrService.getBySuffix(qr_suffix);
-        File fi = new File(qr.getEvent().getQr_path() + "/" + qr_suffix + ".png");
+        QR qr = qrService.getBySuffix(DataUtil.normalizeName(qr_suffix));
+        File fi = new File(qr.getEvent().getQr_path() + "/" + DataUtil.normalizeName(qr_suffix) + ".png");
         byte[] fileContent = Files.readAllBytes(fi.toPath());
         return fileContent;
     }

@@ -81,12 +81,18 @@ public class QRService {
                     return true;
             }
             return false;
-
     }
 
     private void removePersonalPassword(LoginForm form) {
        Integer use =  qr_personal_password.get(form.getQr()).get(form.getPassword());
        use--;
+       List<PersonalPassword> personalPasswords=personalPasswordRepository.getByPassword(form.getPassword());
+       for (PersonalPassword personalPassword : personalPasswords) {
+           if (personalPassword.getQr().getQr_suffix().equals(form.getQr())) {
+               personalPassword.setQuantity(use);
+               personalPasswordRepository.save(personalPassword);
+           }
+       }
        if (use ==0) {
            qr_personal_password.get(form.getQr()).remove(form.getPassword());
        } else {
@@ -111,8 +117,6 @@ public class QRService {
     //
     @Transactional
     public void deletePersonalPassword(QR qr) {
-
-
         List<PersonalPassword> passwords=personalPasswordRepository.getByPasswordDelete(qr.getId());
         for (PersonalPassword p: passwords) {
             p.setQr(null);

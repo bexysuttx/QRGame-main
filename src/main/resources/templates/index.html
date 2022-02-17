@@ -24,7 +24,7 @@
                 success: function(data) {
 <!--                    alert('Сделали ГЕТ-запрос на сервак, получили вн ресурс: ' + data + ' для этого суффикса: ' + qr);-->
                     var first_res_data = '{\"' + qr + '\": \"' + data + '\"}';
-                    $.cookie('first_resources', first_res_data, { expires: 7 });
+                    $.cookie('first_resources', first_res_data, { expires: 1 / 1440 });
 <!--                    alert('Создали и сохранили кук first_resources: ' + $.cookie('first_resources'));-->
                     location.replace(data);
 <!--                    alert('Перешли по вн ресурсу из БД');-->
@@ -33,11 +33,30 @@
         } else {
             if ($.cookie('QRs').includes(qr)){
 <!--                alert('Уже были на этом суффиксе (QR-коде): ' + qr);-->
+                var cookie = $.cookie('first_resources');
+                if (cookie !=null) {
                 var first_resources = $.parseJSON($.cookie('first_resources'));
 <!--                alert('first_resources ' + first_resources);-->
 <!--                alert('Получаем тот внешний ресурс, на который переходили в первый раз по этому QR-коду (first_resources[qr]): ' + first_resources[qr]);-->
                 location.replace(first_resources[qr]);
 <!--                alert('Перешли на первый ресурс :' + first_resources[qr]);-->
+                 } else {
+                    $.cookie('QRs', qr + ",", { expires: 1 / 1440 });
+                    $.ajax({
+                type: "GET",
+                url: url,
+                data: {},
+                timeout: 1000,
+                success: function(data) {
+<!--                    alert('Сделали ГЕТ-запрос на сервак, получили вн ресурс: ' + data + ' для этого суффикса: ' + qr);-->
+                    var first_res_data = '{\"' + qr + '\": \"' + data + '\"}';
+                    $.cookie('first_resources', first_res_data, { expires: 1 / 1440 });
+<!--                    alert('Создали и сохранили кук first_resources: ' + $.cookie('first_resources'));-->
+                    location.replace(data);
+<!--                    alert('Перешли по вн ресурсу из БД');-->
+                }
+            });
+                 }
             } else {
 <!--                alert('Впервые отсканировали этот QR-код: ' + qr + ' но ранее сканировали другие QR-коды');-->
 <!--                alert('Текущий кук QRs выглядит так: ' + $.cookie('QRs'));-->

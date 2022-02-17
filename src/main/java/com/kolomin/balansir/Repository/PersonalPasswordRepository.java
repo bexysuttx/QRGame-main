@@ -16,4 +16,7 @@ public interface PersonalPasswordRepository extends JpaRepository<PersonalPasswo
     @Query(value = "Select * from main.personal_password_table where qr_id=?1",nativeQuery = true)
     List<PersonalPassword> getByPasswordDelete(Long id);
 
+    @Query(value = "Select * from main.personal_password_table where password=?1",nativeQuery = true)
+    List<PersonalPassword> getByPassword(String password);
+
 }

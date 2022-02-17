@@ -2,6 +2,7 @@ package com.kolomin.balansir.Controller.User;
 
 import com.kolomin.balansir.Form.LoginForm;
 import com.kolomin.balansir.Service.*;
+import com.kolomin.balansir.Util.DataUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -33,16 +34,21 @@ public class BalansirController {
 
     @GetMapping("/")
     public String getIndexPage() {
-        return "redirect:"+urlFront;
+        return "main";
     }
 
+    @GetMapping("/adm")
+    public String getAdminPage() {
+        return "redirect:/"+urlFront+"admin";
+    }
     //////
     @GetMapping("/{path}")
     public String getIndex(@PathVariable String path, Model model, HttpSession session){
-            if (!qrService.getSecurity(path) || session.getAttribute(path) != null) { ////
-                return goPage(path, model);
+            String suffix = DataUtil.normalizeName(path);
+            if (!qrService.getSecurity(suffix) || session.getAttribute(suffix) != null) { ////
+                return goPage(suffix, model);
             } else {///
-                model.addAttribute("qr", path);
+                model.addAttribute("qr", suffix);
                 return "access";////
             }
     }
