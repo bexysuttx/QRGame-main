@@ -62,7 +62,29 @@ public class UserService {
             long milliseconds = newDate.getTime() - tokenDateMap.get(token).getTime();
 //            System.out.println("milliseconds = " + milliseconds);
 //            System.out.println("TimeUnit.MILLISECONDS.toMinutes(minutes) = " + TimeUnit.MILLISECONDS.toMinutes(milliseconds));
-            if (TimeUnit.MILLISECONDS.toMinutes(milliseconds) >= 30){    //  задаем время сессии в минутах
+            if (TimeUnit.MILLISECONDS.toMinutes(milliseconds) >= 360){    //  задаем время сессии в минутах
+                System.out.println("Сессия сгорела");
+                tokenDateMap.remove(token);
+                tokenUserMap.remove(token);
+                return false;
+            } else {
+                tokenDateMap.get(token).setTime(newDate.getTime());
+                System.out.println("Сессия не сгорела, обновляю дату = " + tokenDateMap.get(token));
+                return true;
+            }
+        } else {
+            return false;
+        }
+    }
+    public boolean chekToken(String token) {
+        updateTokenMaps();
+        if (tokenDateMap.containsKey(token)){
+            Date newDate = new Date();
+//            System.out.println("newDate = " + newDate);
+            long milliseconds = newDate.getTime() - tokenDateMap.get(token).getTime();
+//            System.out.println("milliseconds = " + milliseconds);
+//            System.out.println("TimeUnit.MILLISECONDS.toMinutes(minutes) = " + TimeUnit.MILLISECONDS.toMinutes(milliseconds));
+            if (TimeUnit.MILLISECONDS.toMinutes(milliseconds) >= 360){    //  задаем время сессии в минутах
                 System.out.println("Сессия сгорела");
                 tokenDateMap.remove(token);
                 tokenUserMap.remove(token);

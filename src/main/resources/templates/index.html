@@ -22,12 +22,16 @@
                 data: {},
                 timeout: 1000,
                 success: function(data) {
+                    if (data != null) {
 <!--                    alert('Сделали ГЕТ-запрос на сервак, получили вн ресурс: ' + data + ' для этого суффикса: ' + qr);-->
                     var first_res_data = '{\"' + qr + '\": \"' + data + '\"}';
                     $.cookie('first_resources', first_res_data, { expires: 1 / 1440 });
 <!--                    alert('Создали и сохранили кук first_resources: ' + $.cookie('first_resources'));-->
                     location.replace(data);
 <!--                    alert('Перешли по вн ресурсу из БД');-->
+                    } else {
+                    location.replace(url);
+                    }
                 }
             });
         } else {
@@ -48,12 +52,16 @@
                 data: {},
                 timeout: 1000,
                 success: function(data) {
+                    if (data != null) {
 <!--                    alert('Сделали ГЕТ-запрос на сервак, получили вн ресурс: ' + data + ' для этого суффикса: ' + qr);-->
                     var first_res_data = '{\"' + qr + '\": \"' + data + '\"}';
                     $.cookie('first_resources', first_res_data, { expires: 1 / 1440 });
 <!--                    alert('Создали и сохранили кук first_resources: ' + $.cookie('first_resources'));-->
                     location.replace(data);
 <!--                    alert('Перешли по вн ресурсу из БД');-->
+                     } else {
+                    location.replace(url);
+                    }
                 }
             });
                  }
@@ -69,6 +77,7 @@
                 data: {},
                 timeout: 1000,
                 success: function(data) {
+                    if (data != null) {
 <!--                    alert(data);-->
 <!--                    alert('Сделали ГЕТ-запрос на сервак, получили вн ресурс: ' + data + ' для этого суффикса: ' + qr);-->
                     var first_resources = $.cookie('first_resources');
@@ -78,6 +87,9 @@
 <!--                    alert('Обновили и сохранили кук first_resources: ' + $.cookie('first_resources'));-->
                     location.replace(data);
 <!--                    alert('Перешли по вн ресурсу из БД');-->
+                     } else {
+                    location.replace(url);
+                    }
                 }
             });
             }

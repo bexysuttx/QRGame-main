@@ -42,7 +42,7 @@ public class BalansirController {
         return "main";
     }
 
-    @GetMapping("/adm")
+    @GetMapping({"/adm","/Adm"})
     public String getAdminPage() {
         return "redirect://"+urlFront+"admin";
     }
