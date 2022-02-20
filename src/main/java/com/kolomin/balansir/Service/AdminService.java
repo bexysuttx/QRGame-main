@@ -25,10 +25,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 import static com.kolomin.balansir.Config.ConfigHandler.QRsPath;
 import static com.kolomin.balansir.Config.ConfigHandler.thisHostPort;
@@ -52,7 +49,7 @@ public class AdminService {
     public static Hashtable<String, Long> resource_came_people_count;
     public static Hashtable<String, Boolean> resource_deleted;
     public static Hashtable<String, Boolean> resource_infinity;
-    public static Hashtable<String, ArrayList<String>> qr_resources;
+    public static LinkedHashMap<String, ArrayList<String>> qr_resources;
     public static Hashtable<String, Boolean> qr_team;
     public static Hashtable<String, String> qr_defaultResource;
     public static Hashtable<String, Long> qr_default_count;
@@ -76,7 +73,7 @@ public class AdminService {
         this.resource_came_people_count = new Hashtable<>();
         this.resource_deleted = new Hashtable<>();
         this.resource_infinity = new Hashtable<>();
-        this.qr_resources = new Hashtable<>();
+        this.qr_resources = new LinkedHashMap<>();
         this.qr_team = new Hashtable<>();
         this.qr_default_count = new Hashtable<>();
         this.qr_general_default_count = new Hashtable<>();
@@ -290,9 +287,9 @@ public class AdminService {
                 newResource.setDeleted(false);
 
                 if (newResource.isInfinity()){      //  тут добавляю все ресурсы в лист чтоб бесконечные оказались в самом конце массива и при вставке в БД оказались в самом низу
-                    resources.add(newResource);     //  таким образом для некомандного QR-кода люди сначала перейдут на всех конечных, потом на бесконечных
+                    resources.add(resources.size()-1,newResource);     //  таким образом для некомандного QR-кода люди сначала перейдут на всех конечных, потом на бесконечных
                 } else {
-                    resources.add(0, newResource);
+                    resources.add(newResource);
                 }
 
 //                resourceService.saveOrUpdate(newResource);
@@ -397,7 +394,7 @@ public class AdminService {
                 }
 
 
-                if (!qr.getAsJsonObject().get("default_resource").toString().replaceAll("\"","").equals("null")){
+                if (!qr.getAsJsonObject().get("default_resource").toString().replaceAll("\"","").equals("null") && !qr.getAsJsonObject().get("default_resource").toString().replaceAll("\"","").isEmpty()){
                     //  если дефолтный внешний ресурс был пуст или не равен пришедшему
                     if (oldQR.getDefault_resource() == null || !oldQR.getDefault_resource().equals(qr.getAsJsonObject().get("default_resource").toString().replaceAll("\"", ""))) {
                         oldQR.setDefault_resource(qr.getAsJsonObject().get("default_resource").toString().replaceAll("\"", ""));
@@ -411,7 +408,7 @@ public class AdminService {
 
 
 //                oldQR.setDeleted(false);
-                oldQR.setGeneral_default_resource_people_count(Long.valueOf(qr.getAsJsonObject().get("general_default_resource_people_count").toString()));
+                oldQR.setGeneral_default_resource_people_count(Long.parseLong(qr.getAsJsonObject().get("general_default_resource_people_count").toString()));
 //                oldQR.setResources(new ArrayList<>());
                 qrService.saveOrUpdate(oldQR);
 
@@ -894,7 +891,9 @@ public class AdminService {
         System.out.println("Запрос на старт статистики, добавляем в хэш-тейблы данные");
         Event event = eventSevice.getEventById(event_id);
         for (QR qr: event.getQrs()) {
-            qr_general_default_count.put(qr.getQr_suffix(), qr.getGeneral_default_resource_people_count());
+            if (qr.getGeneral_default_resource_people_count() != null) {
+                qr_general_default_count.put(qr.getQr_suffix(), qr.getGeneral_default_resource_people_count());
+            }
             qr_team.put(qr.getQr_suffix(), qr.isTeam());
             if (qr.isGroup_access()){ ////
                 qr_group_access.put(qr.getQr_suffix(),qr.isGroup_access());////
@@ -910,9 +909,11 @@ public class AdminService {
                 qr_personal_password.put(qr.getQr_suffix(),passwordsTable);
             }
             ///
-            if (qr.getDefault_resource() != null){
+            if (qr.getDefault_resource() != null || !qr.getDefault_resource().isEmpty()){
                 qr_defaultResource.put(qr.getQr_suffix(), qr.getDefault_resource());
-                qr_default_count.put(qr.getQr_suffix(), qr.getDefault_resource_people_count());
+                if (qr.getDefault_resource_people_count() != null) {
+                    qr_default_count.put(qr.getQr_suffix(), qr.getDefault_resource_people_count());
+                }
             }
             qr_resources.put(qr.getQr_suffix(), new ArrayList<>());
             for (Resource res:qr.getResources()) {
@@ -1009,13 +1010,25 @@ public class AdminService {
         log.info("Запрос на обновление статистики");
         Event event = eventSevice.getEventById(event_id);
         for (QR qr: event.getQrs()) {
-            qr.setDefault_resource_people_count(qr_default_count.get(qr.getQr_suffix()));
-            qr.setGeneral_default_resource_people_count(qr_general_default_count.get(qr.getQr_suffix()));
+            if (qr_default_count.containsKey(qr.getQr_suffix())) {
+                qr.setDefault_resource_people_count(qr_default_count.get(qr.getQr_suffix()));
+                qr.setGeneral_default_resource_people_count(qr_general_default_count.get(qr.getQr_suffix()));
+            } else {
+                qr.setDefault_resource_people_count(0L);
+                qr.setGeneral_default_resource_people_count(0L);
+
+            }
 //            qr.setTeam(qr_team.get(qr.getQr_suffix()));
             for (Resource res: qr.getResources()) {
-                res.setCame_people_count(resource_came_people_count.get(res.getUrl()));
-                res.setDeleted(resource_deleted.get(res.getUrl()));
-                res.setInfinity(resource_infinity.get(res.getUrl()));
+                if (resource_came_people_count.containsKey(res.getUrl())) {
+                    res.setCame_people_count(resource_came_people_count.get(res.getUrl()));
+                }
+                if (resource_deleted.containsKey(res.getUrl())) {
+                    res.setDeleted(resource_deleted.get(res.getUrl()));
+                }
+                if (resource_infinity.containsKey(res.getUrl())) {
+                    res.setInfinity(resource_infinity.get(res.getUrl()));
+                }
                 resourceService.saveOrUpdate(res);
             }
             qrService.saveOrUpdate(qr);
