@@ -909,7 +909,7 @@ public class AdminService {
                 qr_personal_password.put(qr.getQr_suffix(),passwordsTable);
             }
             ///
-            if (qr.getDefault_resource() != null || !qr.getDefault_resource().isEmpty()){
+            if (qr.getDefault_resource() != null){
                 qr_defaultResource.put(qr.getQr_suffix(), qr.getDefault_resource());
                 if (qr.getDefault_resource_people_count() != null) {
                     qr_default_count.put(qr.getQr_suffix(), qr.getDefault_resource_people_count());
