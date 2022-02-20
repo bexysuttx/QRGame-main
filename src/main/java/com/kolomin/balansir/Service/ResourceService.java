@@ -25,6 +25,13 @@ public class ResourceService {
             return false;
         }
     }
+    public boolean findUrl(String url,Long qrId) {
+        if (resourceRepository.findUrl(url, qrId) != null){
+            return true;
+        } else {
+            return false;
+        }
+    }
 
     public Resource getByQRSuffixNotDeletedAndCamePeopleCountMin(String path) {
         return resourceRepository.getByQRSuffixNotDeletedAndCamePeopleCountMin(path);

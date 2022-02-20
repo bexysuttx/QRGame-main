@@ -476,13 +476,13 @@ public class AdminService {
                             oldResourceDeleteToNew.setCame_people_count(came_people_countToNewRes);
                             oldResourceDeleteToNew.setDeleted(deletedToNewRes);
 
-                            resources.add(oldResourceDeleteToNew);     //  таким образом для некомандного QR-кода люди сначала перейдут на всех конечных, потом на бесконечных
+                            resources.add(resources.size()-1,oldResourceDeleteToNew);     //  таким образом для некомандного QR-кода люди сначала перейдут на всех конечных, потом на бесконечных
                         } else {
-                            resources.add(0, oldResource);
+                            resources.add(oldResource);
                         }
                     } else {
                         Resource newResource = new Resource();
-                        if (resourceService.findUrl(resource.getAsJsonObject().get("url").toString().replaceAll("\"", ""))) {
+                        if (resourceService.findUrl(resource.getAsJsonObject().get("url").toString().replaceAll("\"", ""), oldQR.getId())) {
                             response += ",\"errorText\": \"Ресурс " + resource.getAsJsonObject().get("url").toString().replaceAll("\"", "") + " уже существует. Данный ресурс не добавился\",\n";
                             continue;
                         }
@@ -504,9 +504,9 @@ public class AdminService {
                         }
 
                         if (newResource.isInfinity()) {      //  тут добавляю все ресурсы в лист чтоб бесконечные оказались в самом конце массива и при вставке в БД оказались в самом низу
-                            resources.add(newResource);     //  таким образом для некомандного QR-кода люди сначала перейдут на всех конечных, потом на бесконечных
+                            resources.add(resources.size()-1,newResource);     //  таким образом для некомандного QR-кода люди сначала перейдут на всех конечных, потом на бесконечных
                         } else {
-                            resources.add(0, newResource);
+                            resources.add(newResource);
                         }
                     }
                 }
@@ -585,7 +585,7 @@ public class AdminService {
 
                 for (JsonElement resource: qr.getAsJsonObject().get("resources").getAsJsonArray()) {
                     Resource newResource = new Resource();
-                    if (resourceService.findUrl(resource.getAsJsonObject().get("url").toString().replaceAll("\"",""))){
+                    if (resourceService.findUrl(resource.getAsJsonObject().get("url").toString().replaceAll("\"",""), newQR.getId())){
                         log.error(response += ",\"errorText\": \"Ресурс " + resource.getAsJsonObject().get("url").toString().replaceAll("\"","") + " уже существует. Данный ресурс не добавился\",\n");
                         response += ",\"errorText\": \"Ресурс " + resource.getAsJsonObject().get("url").toString().replaceAll("\"","") + " уже существует. Данный ресурс не добавился\",\n";
                         continue;
@@ -608,9 +608,9 @@ public class AdminService {
                     }
 
                     if (newResource.isInfinity()){      //  тут добавляю все ресурсы в лист чтоб бесконечные оказались в самом конце массива и при вставке в БД оказались в самом низу
-                        resources.add(newResource);     //  таким образом для некомандного QR-кода люди сначала перейдут на всех конечных, потом на бесконечных
+                        resources.add(resources.size()-1,newResource);     //  таким образом для некомандного QR-кода люди сначала перейдут на всех конечных, потом на бесконечных
                     } else {
-                        resources.add(0, newResource);
+                        resources.add(newResource);
                     }
                 }
 
@@ -996,7 +996,9 @@ public class AdminService {
                     qr_resources.remove(qr.getQr_suffix());
                 }
                 if (qr_defaultResource.containsKey(qr.getQr_suffix())) {
-                    qr_defaultResource.put(qr.getQr_suffix(), qr.getDefault_resource());
+                    if (qr.getDefault_resource() != null) {
+                        qr_defaultResource.put(qr.getQr_suffix(), qr.getDefault_resource());
+                    }
                 }
             }
         }
