@@ -49,7 +49,7 @@ public class AdminService {
     public static Hashtable<String, Long> resource_came_people_count;
     public static Hashtable<String, Boolean> resource_deleted;
     public static Hashtable<String, Boolean> resource_infinity;
-    public static LinkedHashMap<String, ArrayList<String>> qr_resources;
+    public static Hashtable<String, ArrayList<String>> qr_resources;
     public static Hashtable<String, Boolean> qr_team;
     public static Hashtable<String, String> qr_defaultResource;
     public static Hashtable<String, Long> qr_default_count;
@@ -73,7 +73,7 @@ public class AdminService {
         this.resource_came_people_count = new Hashtable<>();
         this.resource_deleted = new Hashtable<>();
         this.resource_infinity = new Hashtable<>();
-        this.qr_resources = new LinkedHashMap<>();
+        this.qr_resources = new Hashtable<>();
         this.qr_team = new Hashtable<>();
         this.qr_default_count = new Hashtable<>();
         this.qr_general_default_count = new Hashtable<>();
@@ -341,6 +341,8 @@ public class AdminService {
         JsonElement request = new JsonParser().parse(params.getBody());
         log.debug("requestBody" + request);
 
+        statisticStop(oldEvent.getId());
+
         String response = "{\"success\": " + true + "\n";
 
         oldEvent.setName(request.getAsJsonObject().get("name").toString().replaceAll("\"",""));
@@ -394,7 +396,7 @@ public class AdminService {
                 }
 
 
-                if (!qr.getAsJsonObject().get("default_resource").toString().replaceAll("\"","").equals("null") && !qr.getAsJsonObject().get("default_resource").toString().replaceAll("\"","").isEmpty()){
+                if (!qr.getAsJsonObject().get("default_resource").toString().replaceAll("\"","").equals("null") && !qr.getAsJsonObject().get("default_resource").toString().replaceAll("\"","").equals("")){
                     //  если дефолтный внешний ресурс был пуст или не равен пришедшему
                     if (oldQR.getDefault_resource() == null || !oldQR.getDefault_resource().equals(qr.getAsJsonObject().get("default_resource").toString().replaceAll("\"", ""))) {
                         oldQR.setDefault_resource(qr.getAsJsonObject().get("default_resource").toString().replaceAll("\"", ""));
@@ -651,7 +653,6 @@ public class AdminService {
 
         eventSevice.saveOrUpdate(oldEvent);
         log.debug("oldEvent saved\n" + oldEvent);
-        statisticStop(oldEvent.getId());
         statisticStart(oldEvent.getId());
 
         return response += "}";
@@ -1038,4 +1039,5 @@ public class AdminService {
 
         return "\"success\": true, \"text\": \"Перевели данные из мапы в БД\"";
     }
+
 }
