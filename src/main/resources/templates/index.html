@@ -13,7 +13,7 @@
 
         if ($.cookie('QRs') == null){
 <!--            alert('Впервые отсканировали QR-код на мероприятии');-->
-            $.cookie('QRs', qr + ",", { expires: 1 / 1440 });
+            $.cookie('QRs', qr + ",", { expires: 1 });
 <!--            alert('Сохранили кук QRs: ' + $.cookie('QRs'));-->
 
             $.ajax({
@@ -25,7 +25,7 @@
                     if (data != null) {
 <!--                    alert('Сделали ГЕТ-запрос на сервак, получили вн ресурс: ' + data + ' для этого суффикса: ' + qr);-->
                     var first_res_data = '{\"' + qr + '\": \"' + data + '\"}';
-                    $.cookie('first_resources', first_res_data, { expires: 1 / 1440 });
+                    $.cookie('first_resources', first_res_data, { expires: 1 });
 <!--                    alert('Создали и сохранили кук first_resources: ' + $.cookie('first_resources'));-->
                     location.replace(data);
 <!--                    alert('Перешли по вн ресурсу из БД');-->
@@ -45,7 +45,7 @@
                 location.replace(first_resources[qr]);
 <!--                alert('Перешли на первый ресурс :' + first_resources[qr]);-->
                  } else {
-                    $.cookie('QRs', qr + ",", { expires: 1 / 1440 });
+                    $.cookie('QRs', qr + ",", { expires: 1 });
                     $.ajax({
                 type: "GET",
                 url: url,
@@ -55,7 +55,7 @@
                     if (data != null) {
 <!--                    alert('Сделали ГЕТ-запрос на сервак, получили вн ресурс: ' + data + ' для этого суффикса: ' + qr);-->
                     var first_res_data = '{\"' + qr + '\": \"' + data + '\"}';
-                    $.cookie('first_resources', first_res_data, { expires: 1 / 1440 });
+                    $.cookie('first_resources', first_res_data, { expires: 1 });
 <!--                    alert('Создали и сохранили кук first_resources: ' + $.cookie('first_resources'));-->
                     location.replace(data);
 <!--                    alert('Перешли по вн ресурсу из БД');-->
@@ -83,7 +83,7 @@
                     var first_resources = $.cookie('first_resources');
 <!--                    alert('first_resources ' + first_resources);-->
                     first_resources = first_resources.substring(0, first_resources.length - 1) + ',\"' + qr + '\": \"' + data + '\"}';
-                    $.cookie('first_resources', first_resources, { expires: 1 / 1440 });
+                    $.cookie('first_resources', first_resources, { expires: 1 });
 <!--                    alert('Обновили и сохранили кук first_resources: ' + $.cookie('first_resources'));-->
                     location.replace(data);
 <!--                    alert('Перешли по вн ресурсу из БД');-->
