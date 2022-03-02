@@ -1,4 +1,4 @@
-package com.kolomin.balansir.Service;
+package com.kolomin.balansir.Service.impl;
 
 import com.kolomin.balansir.Entity.PersonalPassword;
 import com.kolomin.balansir.Entity.QR;
@@ -18,10 +18,10 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.kolomin.balansir.Service.AdminService.*;
+import static com.kolomin.balansir.Service.impl.AdminService.*;
 
 @Service
-@Scope(proxyMode = ScopedProxyMode.TARGET_CLASS) ////
+@Scope(proxyMode = ScopedProxyMode.TARGET_CLASS)
 public class QRService {
     private static final Logger LOGGER = LoggerFactory.getLogger(QRService.class);
     private QRRepository qrRepository;
@@ -69,7 +69,7 @@ public class QRService {
             if (qr_group_access.containsKey(qr_suffix) || qr_personal_access.containsKey(qr_suffix)){
                 return true;
         }
-            return false;////
+            return false;
 
     }
 
@@ -112,6 +112,18 @@ public class QRService {
             personalPassword.setQuantity(personalAccess.getQuantity());
             passwords.add(personalPassword);
         }
+        List<PersonalPassword> listPasswordDelete=new ArrayList<>();
+        for (int j=0; j<passwords.size()-1;j++){
+        for (int i=j; i<passwords.size()-1;i++) {
+            if (passwords.get(j).getPassword().equals(passwords.get(i + 1).getPassword())) {
+                listPasswordDelete.add(passwords.get(i + 1));
+            }
+        }
+        }
+        if (listPasswordDelete.size()>0) {
+            passwords.removeAll(listPasswordDelete);
+        }
+        qr.setPersonal_password(passwords);
         personalPasswordRepository.saveAll(passwords);
     }
     //

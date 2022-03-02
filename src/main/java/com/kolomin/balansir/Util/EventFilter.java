@@ -9,7 +9,7 @@ import java.text.ParseException;
 import java.util.Date;
 import java.util.Map;
 
-import static com.kolomin.balansir.Service.AdminService.myFormat;
+import static com.kolomin.balansir.Service.impl.AdminService.myFormat;
 
 @Getter
 public class EventFilter {

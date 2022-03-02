@@ -15,6 +15,7 @@ public class PersonalPassword {
     @Id
     @SequenceGenerator(name = "PERSONAL_PASSWORD_GENERATOR", sequenceName = "PERSONAL_PASSWORD_SEQ", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "PERSONAL_PASSWORD_GENERATOR")
+    @Column(unique = true,nullable = false)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)

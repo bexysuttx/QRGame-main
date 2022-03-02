@@ -1,4 +1,4 @@
-package com.kolomin.balansir.Service;
+package com.kolomin.balansir.Service.impl;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
@@ -27,8 +27,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-import static com.kolomin.balansir.Config.ConfigHandler.QRsPath;
-import static com.kolomin.balansir.Config.ConfigHandler.thisHostPort;
+import static com.kolomin.balansir.Configuration.ConfigHandler.QRsPath;
+import static com.kolomin.balansir.Configuration.ConfigHandler.thisHostPort;
 
 /**
  * Сервис для обработки данных администратора
@@ -55,11 +55,11 @@ public class AdminService {
     public static Hashtable<String, Long> qr_default_count;
     public static Hashtable<String, Long> qr_general_default_count;
 
-    public static Hashtable<String,String> qr_password;/////
-    public static Hashtable<String, Boolean> qr_group_access;///
+    public static Hashtable<String,String> qr_password;
+    public static Hashtable<String, Boolean> qr_group_access;
 
-    public static Hashtable<String,Hashtable<String,Integer>> qr_personal_password;/////
-    public static Hashtable<String, Boolean> qr_personal_access;///
+    public static Hashtable<String,Hashtable<String,Integer>> qr_personal_password;
+    public static Hashtable<String, Boolean> qr_personal_access;
 
     @Autowired
     public AdminService(EventSevice eventSevice, QRService qrService, ResourceService resourceService, QRGenerate qrGenerate) {
@@ -79,11 +79,11 @@ public class AdminService {
         this.qr_general_default_count = new Hashtable<>();
         this.qr_defaultResource = new Hashtable<>();
 
-        this.qr_group_access = new Hashtable<>();////
-        this.qr_password = new Hashtable<>();////
+        this.qr_group_access = new Hashtable<>();
+        this.qr_password = new Hashtable<>();
 
-        this.qr_personal_access = new Hashtable<>(); ///
-        this.qr_personal_password = new Hashtable<>();////
+        this.qr_personal_access = new Hashtable<>();
+        this.qr_personal_password = new Hashtable<>();
     }
 
     /**
@@ -197,12 +197,8 @@ public class AdminService {
         }
         newEvent.setName(request.getAsJsonObject().get("name").toString().replaceAll("\"",""));
         newEvent.setCity(request.getAsJsonObject().get("city").toString().replaceAll("\"",""));
-        try {
-            newEvent.setDate(myFormat.parse(request.getAsJsonObject().get("date").toString().replaceAll("\"","")));
-        } catch (ParseException e) {
-            log.error("Ошибка в конвертации даты");
-            return "{\"success\": \"false\", \"errorText\": \"Ошибка в конвертации даты. Мероприятие не добавлено.\"}";
-        }
+        newEvent.setDate(request.getAsJsonObject().get("date").toString().replaceAll("\"",""));
+
         newEvent.setArea(request.getAsJsonObject().get("area").toString().replaceAll("\"",""));
         newEvent.setDeleted(false);
         newEvent.setQrs(new ArrayList<>());
@@ -232,28 +228,28 @@ public class AdminService {
                 newQR.setTeam(false);
                 newQR.setTeam_for_front(false);
             }
-//
 
-           if (qr.getAsJsonObject().get("group_access").toString().equals("true")){ //////
-              newQR.setGroup_access(true);////
-               newQR.setGroup_password(qr.getAsJsonObject().get("group_password").toString().replaceAll("\"",""));////
+
+           if (qr.getAsJsonObject().get("group_access").toString().equals("true")){
+              newQR.setGroup_access(true);
+               newQR.setGroup_password(qr.getAsJsonObject().get("group_password").toString().replaceAll("\"",""));
             } else {
-               newQR.setGroup_access(false); ////
+               newQR.setGroup_access(false);
             }
 
-           //
+
             newQR.setDeleted(false);
             newQR.setGeneral_default_resource_people_count(0L);
             if (!qr.getAsJsonObject().get("default_resource").toString().replaceAll("\"","").equals("")){
                 newQR.setDefault_resource(qr.getAsJsonObject().get("default_resource").toString().replaceAll("\"",""));
                 newQR.setDefault_resource_people_count(0L);
             }
-            newQR.setPersonal_password(new ArrayList<>());////
+            newQR.setPersonal_password(new ArrayList<>());
 
             newQR.setResources(new ArrayList<>());
             qrService.saveOrUpdate(newQR);
             qrGenerate.QRGenerate(newQR.getQr_url(), newEvent.getQr_path(), newQR.getQr_suffix());
-            //////////
+
             if (qr.getAsJsonObject().get("personal_access").toString().equals("true")) {
                 newQR.setPersonal_access(true);
                 QRPersonalAccessModel personalAccess= new QRPersonalAccessModel();
@@ -264,7 +260,6 @@ public class AdminService {
                 qrService.generatePersonalPassword(personalAccess,newQR);
             }
 
-            /////////
             ArrayList<Resource> resources = new ArrayList<>();
 
             for (JsonElement resource: qr.getAsJsonObject().get("resources").getAsJsonArray()) {
@@ -285,12 +280,9 @@ public class AdminService {
                 newResource.setUrl(resource.getAsJsonObject().get("url").toString().replaceAll("\"",""));
                 newResource.setCame_people_count(0L);
                 newResource.setDeleted(false);
-
-                if (newResource.isInfinity()){      //  тут добавляю все ресурсы в лист чтоб бесконечные оказались в самом конце массива и при вставке в БД оказались в самом низу
-                    resources.add(resources.size()-1,newResource);     //  таким образом для некомандного QR-кода люди сначала перейдут на всех конечных, потом на бесконечных
-                } else {
-                    resources.add(newResource);
-                }
+                newResource.setName(resource.getAsJsonObject().get("name").toString().replaceAll("\"",""));
+                newResource.setNumber(Integer.parseInt(resource.getAsJsonObject().get("number").toString().replaceAll("\"","")));
+                resources.add(newResource);
 
 //                resourceService.saveOrUpdate(newResource);
 //                newQR.getResources().add(newResource);
@@ -308,6 +300,7 @@ public class AdminService {
         }
 
         eventSevice.saveOrUpdate(newEvent);
+
         statisticStart(newEvent.getId());
         log.debug("newEvent saved\n" + newEvent);
 
@@ -347,12 +340,7 @@ public class AdminService {
 
         oldEvent.setName(request.getAsJsonObject().get("name").toString().replaceAll("\"",""));
         oldEvent.setCity(request.getAsJsonObject().get("city").toString().replaceAll("\"",""));
-        try {
-            oldEvent.setDate(myFormat.parse(request.getAsJsonObject().get("date").toString().replaceAll("\"","")));
-        } catch (ParseException e) {
-            log.error("Ошибка в конвертации даты");
-            return "{\"success\": \"false\", \"errorText\": \"Ошибка в конвертации даты. Мероприятие не добавлено.\"}";
-        }
+        oldEvent.setDate(request.getAsJsonObject().get("date").toString().replaceAll("\"",""));
         oldEvent.setArea(request.getAsJsonObject().get("area").toString().replaceAll("\"",""));
 //        oldEvent.setDeleted(false);
         //  удаляем папку со старыми QR-кодами и генерируем новый каталог
@@ -385,12 +373,12 @@ public class AdminService {
                     oldQR.setTeam_for_front(false);
                 }
 
-                if (qr.getAsJsonObject().has("group_access")){ //////
+                if (qr.getAsJsonObject().has("group_access")){
                     if (qr.getAsJsonObject().get("group_access").toString().equals("true")) {
-                        oldQR.setGroup_access(true);////
-                        oldQR.setGroup_password(qr.getAsJsonObject().get("group_password").toString().replaceAll("\"", ""));////
+                        oldQR.setGroup_access(true);
+                        oldQR.setGroup_password(qr.getAsJsonObject().get("group_password").toString().replaceAll("\"", ""));
                     } else {
-                        oldQR.setGroup_access(false); ////
+                        oldQR.setGroup_access(false);
                         oldQR.setGroup_password(null);
                     }
                 }
@@ -416,8 +404,8 @@ public class AdminService {
 
                 qrGenerate.QRGenerate(oldQR.getQr_url(), oldEvent.getQr_path(), oldQR.getQr_suffix());
 
-                oldQR.setPersonal_password(new ArrayList<>());////
-                //////////
+                oldQR.setPersonal_password(new ArrayList<>());
+
                 if (qr.getAsJsonObject().has("personal_access")) {
                     if (qr.getAsJsonObject().get("personal_access").toString().equals("true")) {
                         oldQR.setPersonal_access(true);
@@ -434,8 +422,6 @@ public class AdminService {
                     }
                 }
 
-                /////////
-
                 ArrayList<Resource> resources = new ArrayList<>();
 
                 for (JsonElement resource : qr.getAsJsonObject().get("resources").getAsJsonArray()) {
@@ -444,7 +430,7 @@ public class AdminService {
 
 //                        oldResource.setQr(oldQR);
                         oldResource.setQr_suffix(oldQR.getQr_suffix());
-                        if (resource.getAsJsonObject().get("people_count").toString().replaceAll("\"", "").equals("0") || resource.getAsJsonObject().get("people_count").toString().replaceAll("\"", "").equals("")) {
+                        if (resource.getAsJsonObject().get("people_count").toString().replaceAll("\"", "").equals("")) {
                             oldResource.setInfinity(true);
                             oldResource.setPeople_count(0L);
                             if (oldQR.isDeleted()){
@@ -459,29 +445,10 @@ public class AdminService {
                         }
                         oldResource.setUrl(resource.getAsJsonObject().get("url").toString().replaceAll("\"", ""));
 //                        oldResource.setDeleted(false);
+                        oldResource.setName(resource.getAsJsonObject().get("name").toString().replaceAll("\"",""));
+                        oldResource.setNumber(Integer.parseInt(resource.getAsJsonObject().get("number").toString().replaceAll("\"","")));
+                        resources.add(oldResource);
 
-                        if (oldResource.isInfinity()) {      //  тут добавляю все ресурсы в лист чтоб бесконечные оказались в самом конце массива и при вставке в БД оказались в самом низу
-                            String qr_suffixToNewRes = oldResource.getQr_suffix();
-                            boolean infinityToNewRes = oldResource.isInfinity();
-                            String urlToNewRes = oldResource.getUrl();
-                            Long people_countToNewRes = oldResource.getPeople_count();
-                            Long came_people_countToNewRes = oldResource.getCame_people_count();
-                            boolean deletedToNewRes = oldResource.isDeleted();
-                            resourceService.delete(oldResource);
-
-                            Resource oldResourceDeleteToNew = new Resource();
-                            oldResourceDeleteToNew.setQr_suffix(qr_suffixToNewRes);
-                            oldResourceDeleteToNew.setQr(oldQR);
-                            oldResourceDeleteToNew.setInfinity(infinityToNewRes);
-                            oldResourceDeleteToNew.setUrl(urlToNewRes);
-                            oldResourceDeleteToNew.setPeople_count(people_countToNewRes);
-                            oldResourceDeleteToNew.setCame_people_count(came_people_countToNewRes);
-                            oldResourceDeleteToNew.setDeleted(deletedToNewRes);
-
-                            resources.add(resources.size()-1,oldResourceDeleteToNew);     //  таким образом для некомандного QR-кода люди сначала перейдут на всех конечных, потом на бесконечных
-                        } else {
-                            resources.add(oldResource);
-                        }
                     } else {
                         Resource newResource = new Resource();
                         if (resourceService.findUrl(resource.getAsJsonObject().get("url").toString().replaceAll("\"", ""), oldQR.getId())) {
@@ -499,17 +466,16 @@ public class AdminService {
                         }
                         newResource.setUrl(resource.getAsJsonObject().get("url").toString().replaceAll("\"", ""));
                         newResource.setCame_people_count(0L);
+                        newResource.setName(resource.getAsJsonObject().get("name").toString().replaceAll("\"",""));
+                        newResource.setNumber(Integer.parseInt(resource.getAsJsonObject().get("number").toString().replaceAll("\"","")));
                         if (oldQR.isDeleted()){
                             newResource.setDeleted(true);
                         } else {
                             newResource.setDeleted(false);
                         }
 
-                        if (newResource.isInfinity()) {      //  тут добавляю все ресурсы в лист чтоб бесконечные оказались в самом конце массива и при вставке в БД оказались в самом низу
-                            resources.add(resources.size()-1,newResource);     //  таким образом для некомандного QR-кода люди сначала перейдут на всех конечных, потом на бесконечных
-                        } else {
-                            resources.add(newResource);
-                        }
+                        resources.add(newResource);
+
                     }
                 }
 
@@ -540,12 +506,12 @@ public class AdminService {
                     newQR.setTeam_for_front(false);
                 }
 
-                if (qr.getAsJsonObject().has("group_access")) { //////
+                if (qr.getAsJsonObject().has("group_access")) {
                     if (qr.getAsJsonObject().get("group_access").toString().equals("true")) {
-                        newQR.setGroup_access(true);////
+                        newQR.setGroup_access(true);
                         newQR.setGroup_password(qr.getAsJsonObject().get("group_password").toString().replaceAll("\"", ""));////
                     } else {
-                        newQR.setGroup_access(false); ////
+                        newQR.setGroup_access(false);
                     }
                 }
 
@@ -564,9 +530,8 @@ public class AdminService {
                 oldAndNewQrs.add(newQR);
                 qrGenerate.QRGenerate(newQR.getQr_url(), oldEvent.getQr_path(), newQR.getQr_suffix());
 
-                newQR.setPersonal_password(new ArrayList<>());////
+                newQR.setPersonal_password(new ArrayList<>());
 
-                //////////
                 if (qr.getAsJsonObject().has("personal_access")) {
                     if (qr.getAsJsonObject().get("personal_access").toString().equals("true")) {
                         newQR.setPersonal_access(true);
@@ -581,39 +546,36 @@ public class AdminService {
                     }
                 }
 
-                /////////
+
 
                 ArrayList<Resource> resources = new ArrayList<>();
 
                 for (JsonElement resource: qr.getAsJsonObject().get("resources").getAsJsonArray()) {
                     Resource newResource = new Resource();
-                    if (resourceService.findUrl(resource.getAsJsonObject().get("url").toString().replaceAll("\"",""), newQR.getId())){
-                        log.error(response += ",\"errorText\": \"Ресурс " + resource.getAsJsonObject().get("url").toString().replaceAll("\"","") + " уже существует. Данный ресурс не добавился\",\n");
-                        response += ",\"errorText\": \"Ресурс " + resource.getAsJsonObject().get("url").toString().replaceAll("\"","") + " уже существует. Данный ресурс не добавился\",\n";
+                    if (resourceService.findUrl(resource.getAsJsonObject().get("url").toString().replaceAll("\"", ""), newQR.getId())) {
+                        log.error(response += ",\"errorText\": \"Ресурс " + resource.getAsJsonObject().get("url").toString().replaceAll("\"", "") + " уже существует. Данный ресурс не добавился\",\n");
+                        response += ",\"errorText\": \"Ресурс " + resource.getAsJsonObject().get("url").toString().replaceAll("\"", "") + " уже существует. Данный ресурс не добавился\",\n";
                         continue;
                     }
                     newResource.setQr(newQR);
                     newResource.setQr_suffix(newQR.getQr_suffix());
-                    if (resource.getAsJsonObject().get("people_count").toString().replaceAll("\"","").equals("")){
+                    if (resource.getAsJsonObject().get("people_count").toString().replaceAll("\"", "").equals("")) {
                         newResource.setInfinity(true);
                         newResource.setPeople_count(0L);
                     } else {
                         newResource.setInfinity(false);
-                        newResource.setPeople_count(Long.valueOf(resource.getAsJsonObject().get("people_count").toString().replaceAll("\"","")));
+                        newResource.setPeople_count(Long.valueOf(resource.getAsJsonObject().get("people_count").toString().replaceAll("\"", "")));
                     }
-                    newResource.setUrl(resource.getAsJsonObject().get("url").toString().replaceAll("\"",""));
+                    newResource.setUrl(resource.getAsJsonObject().get("url").toString().replaceAll("\"", ""));
                     newResource.setCame_people_count(0L);
-                    if (newQR.isDeleted()){
+                    if (newQR.isDeleted()) {
                         newResource.setDeleted(true);
                     } else {
                         newResource.setDeleted(false);
                     }
-
-                    if (newResource.isInfinity()){      //  тут добавляю все ресурсы в лист чтоб бесконечные оказались в самом конце массива и при вставке в БД оказались в самом низу
-                        resources.add(resources.size()-1,newResource);     //  таким образом для некомандного QR-кода люди сначала перейдут на всех конечных, потом на бесконечных
-                    } else {
-                        resources.add(newResource);
-                    }
+                    newResource.setName(resource.getAsJsonObject().get("name").toString().replaceAll("\"",""));
+                    newResource.setNumber(Integer.parseInt(resource.getAsJsonObject().get("number").toString().replaceAll("\"","")));
+                    resources.add(newResource);
                 }
 
                 for (Resource newResource:resources) {
@@ -653,6 +615,7 @@ public class AdminService {
 
         eventSevice.saveOrUpdate(oldEvent);
         log.debug("oldEvent saved\n" + oldEvent);
+
         statisticStart(oldEvent.getId());
 
         return response += "}";
@@ -736,7 +699,7 @@ public class AdminService {
     /**
      * Данный метод вытаскивает мероприятия из БД согласно пришедшим данным из фильтра
      * */
-    public String eventsFilter(Map<String, String> map) {
+    public String eventsFilter(Map<String, String> map) throws ParseException {
 //        log.debug(map.toString());
         String name = "%";
         String city = "%";
@@ -758,8 +721,7 @@ public class AdminService {
             count++;
         }
         if (map.containsKey("date") && !map.get("date").isEmpty()) {
-            String [] dateArr =  map.get("date").split("-");
-            date = dateArr[2] + "-" + dateArr[1] + "-" + dateArr[0];
+            date = map.get("date");
             count++;
         }
 
@@ -896,11 +858,11 @@ public class AdminService {
                 qr_general_default_count.put(qr.getQr_suffix(), qr.getGeneral_default_resource_people_count());
             }
             qr_team.put(qr.getQr_suffix(), qr.isTeam());
-            if (qr.isGroup_access()){ ////
-                qr_group_access.put(qr.getQr_suffix(),qr.isGroup_access());////
-                qr_password.put(qr.getQr_suffix(), qr.getGroup_password());////
+            if (qr.isGroup_access()){
+                qr_group_access.put(qr.getQr_suffix(),qr.isGroup_access());
+                qr_password.put(qr.getQr_suffix(), qr.getGroup_password());
             }
-            ///
+
             if (qr.isPersonal_access()) {
                 qr_personal_access.put(qr.getQr_suffix(),qr.isPersonal_access());
                 Hashtable<String,Integer> passwordsTable = new Hashtable<>();
@@ -909,7 +871,7 @@ public class AdminService {
                 }
                 qr_personal_password.put(qr.getQr_suffix(),passwordsTable);
             }
-            ///
+
             if (qr.getDefault_resource() != null){
                 qr_defaultResource.put(qr.getQr_suffix(), qr.getDefault_resource());
                 if (qr.getDefault_resource_people_count() != null) {
@@ -926,12 +888,12 @@ public class AdminService {
             }
         }
         System.out.println("qr_team = " + qr_team);
-        //
+
         System.out.println("qr_password = " +qr_password);
         System.out.println("qr_group_access = " +qr_group_access);
         System.out.println("qr_personal_password = " +qr_personal_password);
         System.out.println("qr_personal_access = " +qr_personal_access);
-        //
+
         System.out.println("qr_general_default_count = " + qr_general_default_count);
         System.out.println("qr_defaultResource = " + qr_defaultResource);
         System.out.println("qr_default_count = " + qr_default_count);
@@ -979,20 +941,19 @@ public class AdminService {
                     qr_team.remove(qr.getQr_suffix());
                 }
                 ///
-                if (qr_password.containsKey(qr.getQr_suffix())) {////
-                    qr_password.remove(qr.getQr_suffix());/////
+                if (qr_password.containsKey(qr.getQr_suffix())) {
+                    qr_password.remove(qr.getQr_suffix());
                 }
-                if (qr_group_access.containsKey(qr.getQr_suffix())) {/////
-                    qr_group_access.remove(qr.getQr_suffix()); ///
+                if (qr_group_access.containsKey(qr.getQr_suffix())) {
+                    qr_group_access.remove(qr.getQr_suffix());
                 }
-                if (qr_personal_password.containsKey(qr.getQr_suffix())) {////
-                    qr_personal_password.remove(qr.getQr_suffix());/////
+                if (qr_personal_password.containsKey(qr.getQr_suffix())) {
+                    qr_personal_password.remove(qr.getQr_suffix());
                 }
-                if (qr_personal_access.containsKey(qr.getQr_suffix())) {/////
-                    qr_personal_access.remove(qr.getQr_suffix()); ///
+                if (qr_personal_access.containsKey(qr.getQr_suffix())) {
+                    qr_personal_access.remove(qr.getQr_suffix());
                 }
 
-                ///
                 if (qr_resources.containsKey(qr.getQr_suffix())) {
                     qr_resources.remove(qr.getQr_suffix());
                 }

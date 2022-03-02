@@ -1,4 +1,4 @@
-package com.kolomin.balansir.Service;
+package com.kolomin.balansir.Service.impl;
 
 import com.kolomin.balansir.Entity.Resource;
 import com.kolomin.balansir.Repository.ResourceRepository;

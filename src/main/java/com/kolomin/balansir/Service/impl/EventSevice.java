@@ -1,4 +1,4 @@
-package com.kolomin.balansir.Service;
+package com.kolomin.balansir.Service.impl;
 
 import com.kolomin.balansir.Entity.Event;
 import com.kolomin.balansir.Repository.EventRepository;
@@ -55,6 +55,7 @@ public class EventSevice {
     }
 
     public Iterable<? extends Event> findAllByQueryDeletedFalse(String name, String city, String area, String date) {
+
         return eventRepository.findAllByQueryDeletedFalse(name, city, area, date);
     }
 

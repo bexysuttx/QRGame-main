@@ -5,7 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-@Repository
 public interface ResourceRepository extends JpaRepository<Resource, Long> {
 
     @Query(value = "SELECT id FROM main.resouces_table WHERE url = ?1 and qr_id = ?2", nativeQuery = true)

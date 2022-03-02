@@ -1,19 +1,21 @@
 package com.kolomin.balansir.Controller.Admin;
 
 import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;import com.kolomin.balansir.Service.*;
+import com.google.gson.JsonParser;
+import com.kolomin.balansir.Service.impl.UserService;
+import com.kolomin.balansir.Service.impl.AdminService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.Date;
 import java.util.Map;
 
-import static com.kolomin.balansir.Config.ConfigHandler.defaultResource;
-import static com.kolomin.balansir.Config.ConfigHandler.defaultResourceDate;
+import static com.kolomin.balansir.Configuration.ConfigHandler.defaultResource;
+import static com.kolomin.balansir.Configuration.ConfigHandler.defaultResourceDate;
 
 /**
  * Контроллер для обработки данных администратора
@@ -179,7 +181,7 @@ public class AdminController {
      * Данный маппинг - фильтр мероприятий, выдаёт все мероприятия по пришедшим в запросе значениям
      * */
     @GetMapping("/eventsFilter")
-    public ResponseEntity eventsFilter(HttpEntity<String> rq, @RequestParam Map<String, String> requestParams){
+    public ResponseEntity eventsFilter(HttpEntity<String> rq, @RequestParam Map<String, String> requestParams) throws ParseException {
         if (userService.chekToken(rq)){
             log.info("Запрос фильтра по данным " + requestParams.toString());
             return ResponseEntity.ok(adminService.eventsFilter(requestParams));

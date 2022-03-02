@@ -1,4 +1,4 @@
-package com.kolomin.balansir.Config;
+package com.kolomin.balansir.Configuration;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;

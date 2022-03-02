@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<html>
+<head>
+    <link rel="stylesheet" href="/static/css/bootstrap.css">
+    <link rel="stylesheet" href="/static/css/bootstrap-theme.css">
+    <link rel="stylesheet" href="/static/css/font-awesome.css">
+    <link rel="stylesheet" href="/static/css/app.css">
+</head>
+<div class="container container-table">
+    <div class="row vertical-center-row">
+        <div class="col-md-8 col-md-offset-2">
+            <div class="form-group input-group input-group-lg h col-md-12 col-xs-12 text-center">
+                <div class="panel panel-success pb-3">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                            <i class="fa fa-code"></i> Генератор ресурсов для QR-кода:
+                        </h4>
+                    </div>
+                    <div class="panel-body">
+                        <p class="lead">
+                            Данный функционал предназначен для быстрой генерации пользовательских ресурсов и
+                            прикреплению его к нужному QR-коду. Файл должен содержать информацию о суффиксе Qr-кода,
+                            количеству людей на ресурсе, сообщение под каждый сгенерированный ресурс.
+                        </p>
+                        <h2>
+                            <i class="glyphicon glyphicon-share"></i> Добавьте .csv файл:
+                        </h2>
+                        <div class="col-md-6 col-md-offset-3">
+                        <form id="upload-container" enctype="multipart/form-data" action="/admin/loadCsv" method="post">
+                            <img id="upload-image" src="/img/upload.svg">
+                            <div>
+                                <input id="file-input" type="file" name="file" multiple>
+                                <label for="file-input">Выберите файл</label>
+                                <span>или перетащите его сюда</span>
+                            </div>
+                        </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="/static/js/jquery.js"></script>
+<script src="/static/js/bootstrap.js"></script>
+<script src="/static/js/app.js"></script>
+</html>

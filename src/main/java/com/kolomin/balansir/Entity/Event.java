@@ -6,7 +6,7 @@ import javax.persistence.*;
 import java.util.Date;
 import java.util.List;
 
-import static com.kolomin.balansir.Service.AdminService.qr_resources;
+import static com.kolomin.balansir.Service.impl.AdminService.qr_resources;
 
 @Entity
 @Table(name = "event_table")
@@ -16,13 +16,15 @@ public class Event {
     @Id
     @SequenceGenerator(name = "EVENT_GENERATOR", sequenceName = "EVENT_SEQ", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "EVENT_GENERATOR")
+    @Column(unique = true,nullable = false)
     private Long id;
+
     @Column
     private String name;
     @Column
     private String city;
     @Column
-    private Date date;
+    private String date;
     @Column
     private String area;
     @Column
@@ -61,8 +63,7 @@ public class Event {
                 "\t\"id\": \"" + id + "\",\n" +
                 "\t\"name\": \"" + name + "\",\n" +
                 "\t\"city\": \"" + city + "\",\n" +
-                "\t\"date\": \"" + date.toString().substring(8,10) + "-" + date.toString().substring(5,7) +  "-" + date.toString().substring(0,4) + "\",\n" +
-                "\t\"unixtime\": " + date.getTime()/1000L + ",\n" +
+                "\t\"date\": \"" + date + "\",\n" +
                 "\t\"area\": \"" + area + "\",\n" +
                 "\t\"people_count\": " + people_count + ",\n" +
                 "\t\"general_default_resource_people_count\": " + general_default_resource_people_count + ",\n" +

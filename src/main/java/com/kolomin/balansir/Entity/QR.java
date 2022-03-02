@@ -7,7 +7,7 @@ import lombok.ToString;
 import javax.persistence.*;
 import java.util.List;
 
-import static com.kolomin.balansir.Config.ConfigHandler.thisHostPort;
+import static com.kolomin.balansir.Configuration.ConfigHandler.thisHostPort;
 
 @Entity
 @Table(name = "qr_table")
@@ -17,7 +17,9 @@ public class QR {
     @Id
     @SequenceGenerator(name = "QR_GENERATOR", sequenceName = "QR_SEQ", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "QR_GENERATOR")
+    @Column(unique = true,nullable = false)
     private Long id;
+
     @Column
     private String qr_suffix;
 
@@ -28,36 +30,40 @@ public class QR {
 
     @Column
     private String qr_url;
-    @Column
-    private boolean team;
-    @Column
-    private boolean group_access;/////
-    @Column
-    private boolean team_for_front;
-    @Column
-    private boolean deleted;
-    @Column
-    private Long general_default_resource_people_count;
-    @Column
-    private String default_resource;
-    @Column
-    private Long default_resource_people_count;
-    @Column
-    private String group_password;////
 
     @Column
-    private boolean personal_access;////
+    private boolean team;
+
+    @Column
+    private boolean group_access;
+
+    @Column
+    private boolean team_for_front;
+
+    @Column
+    private boolean deleted;
+
+    @Column
+    private Long general_default_resource_people_count;
+
+    @Column
+    private String default_resource;
+
+    @Column
+    private Long default_resource_people_count;
+
+    @Column
+    private String group_password;
+
+    @Column
+    private boolean personal_access;
 
     @OneToMany(mappedBy = "qr", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("id ASC")
     private List<Resource> resources;
-    //
 
     @OneToMany(mappedBy = "qr", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<PersonalPassword> personal_password;
-
-    //
-
 
 
     @Override

@@ -1,23 +1,22 @@
 package com.kolomin.balansir.Controller.User;
 
 import com.kolomin.balansir.Form.LoginForm;
-import com.kolomin.balansir.Service.*;
+import com.kolomin.balansir.Service.PageService;
+import com.kolomin.balansir.Service.impl.AdminService;
+import com.kolomin.balansir.Service.impl.QRService;
+import com.kolomin.balansir.Service.impl.ResourceService;
 import com.kolomin.balansir.Util.DataUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import java.net.URI;
-
-import static com.kolomin.balansir.Config.ConfigHandler.*;
-import static com.kolomin.balansir.Service.AdminService.*;
+import static com.kolomin.balansir.Configuration.ConfigHandler.*;
+import static com.kolomin.balansir.Service.impl.AdminService.*;
 
 @Controller
 @Slf4j
@@ -26,16 +25,18 @@ public class BalansirController {
 
     private QRService qrService;
     private ResourceService resourceService;
+    private PageService pageService;
 
     @Autowired
-    public BalansirController(QRService qrService, ResourceService resourceService, AdminService adminService) {
+    public BalansirController(QRService qrService, ResourceService resourceService, AdminService adminService,PageService pageService) {
         this.qrService = qrService;
         this.resourceService = resourceService;
+        this.pageService=pageService;
     }
 
-    @RequestMapping("favicon.ico")////
-    @ResponseBody////
-   public void favicon() {}///
+    @RequestMapping("favicon.ico")
+    @ResponseBody
+   public void favicon() {}
 
     @GetMapping("/")
     public String getIndexPage() {
@@ -46,19 +47,18 @@ public class BalansirController {
     public String getAdminPage() {
         return "redirect://"+urlFront+"admin";
     }
-    //////
+
     @GetMapping("/{path}")
-    public String getIndex(@PathVariable String path, Model model, HttpSession session){
-            String suffix = DataUtil.normalizeName(path);
-            if (!qrService.getSecurity(suffix) || session.getAttribute(suffix) != null) { ////
-                return goPage(suffix, model);
-            } else {///
-                model.addAttribute("qr", suffix);
-                return "access";////
-            }
+    public String getIndex(@PathVariable String path, Model model, HttpSession session) {
+        String suffix = DataUtil.normalizeName(path);
+        if (!qrService.getSecurity(suffix) || session.getAttribute(suffix) != null) { ////
+            return goPage(suffix, model);
+        } else {///
+            model.addAttribute("qr", suffix);
+            return "access";////
+        }
     }
-    ////
-////////
+
     @PostMapping("/sign-in-handler")
     public String signIn(LoginForm form,Model model,HttpSession session) {
        if(qrService.isAccess(form)){
@@ -70,16 +70,21 @@ public class BalansirController {
            return "access";
        }
     }
-    //////
-//////
+
+    @GetMapping("/p/{path}")
+    public String getPage(@PathVariable String path, Model model, HttpServletRequest request) {
+
+        model.addAttribute("message",pageService.getMessageByUrl(request.getRequestURI()));
+        return "custom-resource";
+    }
+
     private String goPage(String path, Model model) {
         System.out.println("Отсканировали");
         model.addAttribute("qr", path);
         model.addAttribute("url", thisHostPort + "go/");
         return "index";
     }
-    ///////
-//////
+
 //    На хэштаблицах
     @ResponseBody
     @GetMapping("/go/{path}")

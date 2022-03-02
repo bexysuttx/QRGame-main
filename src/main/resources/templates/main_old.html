@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<html>
+<head>
+    <link rel="stylesheet" href="/static/css/bootstrap.css">
+    <link rel="stylesheet" href="/static/css/bootstrap-theme.css">
+    <link rel="stylesheet" href="/static/css/font-awesome.css">
+    <link rel="stylesheet" href="/static/css/app.css">
+</head>
+<div class="container container-table">
+    <div class="row vertical-center-row">
+        <div class="col-md-4 col-md-offset-4">
+            <div class="form-group input-group input-group-lg h col-md-12 col-xs-12">
+                <h2>
+                    <i class="glyphicon glyphicon-share"></i> Введите Ваш ID:
+                </h2>
+            </div>
+            <form onkeypress="if(event.keyCode == 13) return false;">
+                <div class="form-group input-group h input-group-lg">
+                    <span class="input-group-addon"><span class="glyphicon glyphicon-phone"></span></span>
+                    <input id="suffix" class="form-control" placeholder="ID">
+                </div>
+                <div class="form-group input-group input-group-lg h col-md-8 col-md-offset-2 col-xs-12">
+                    <button type="button" onclick="goQR()" class="btn btn-default form-control">
+                        <span class="glyphicon glyphicon-log-in"></span> Перейти
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script src="/static/js/jquery.js"></script>
+<script src="/static/js/bootstrap.js"></script>
+<script src="/static/js/app.js"></script>
+</html>

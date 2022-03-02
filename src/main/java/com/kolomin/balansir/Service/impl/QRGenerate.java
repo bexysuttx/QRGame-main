@@ -1,4 +1,4 @@
-package com.kolomin.balansir.Service;
+package com.kolomin.balansir.Service.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import net.glxn.qrgen.core.image.ImageType;

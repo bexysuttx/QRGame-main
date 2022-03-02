@@ -5,7 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-@Repository
 public interface QRRepository extends JpaRepository<QR, Long> {
 
     @Query(value = "SELECT id FROM main.qr_table WHERE qr_suffix = ?1", nativeQuery = true)
