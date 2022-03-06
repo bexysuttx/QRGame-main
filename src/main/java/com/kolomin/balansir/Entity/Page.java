@@ -1,15 +1,19 @@
 package com.kolomin.balansir.Entity;
 
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.StringJoiner;
 
 /**
  * @author macbook on 25.02.2022
  */
 @Entity
 @Table(name="page_table")
-@Data
+@Getter
+@Setter
 public class Page {
 
     @Id
@@ -24,11 +28,24 @@ public class Page {
     @Column
     private String message;
 
+    @Column
+    private String qr;
+
    public  Page() {
     }
 
-    public Page(String page, String message) {
+    public Page(String page, String message, String qr) {
         this.page = page;
         this.message = message;
+        this.qr=qr;
     }
+
+    @Override
+    public String toString() {
+        return "\n{\n" +
+                "\t\"page\": \"" + page + "\",\n" +
+                "\t\"msg\": \"" + message + "\"\n" +
+                "}";
+    }
+
 }

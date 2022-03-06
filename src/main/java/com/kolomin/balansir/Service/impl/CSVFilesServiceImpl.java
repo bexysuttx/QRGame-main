@@ -36,6 +36,9 @@ public class CSVFilesServiceImpl implements CSVFilesService {
     @Autowired
     private PageRepository pageRepository;
 
+    @Autowired
+    private AdminService adminService;
+
     @Override
     public Path transferFiles(Path source, Path dest) {
         return null;
@@ -49,7 +52,6 @@ public class CSVFilesServiceImpl implements CSVFilesService {
                 .withType(cz)
                 .build()
                 .parse();
-        beans.forEach(System.out::println);
         return beans;
 
     }
@@ -75,20 +77,25 @@ public class CSVFilesServiceImpl implements CSVFilesService {
 
     private void  generateCustomResources(List<CSVResourceModel> propResources) throws IOException {
         List<String> qr_suff = new ArrayList<>();
+        List<Long> eventId= new ArrayList<>();
         qr_suff.add(propResources.get(0).getSuffixQR());
         QR qr = null;
         for (int i=0;i<propResources.size();i++) {
             if (qr == null || !qr.getQr_suffix().equals(propResources.get(i).getSuffixQR()) || !qr_suff.contains(propResources.get(i).getSuffixQR())) {
                 qr_suff.add(propResources.get(i).getSuffixQR());
                 qr = qrRepository.getBySuffix(propResources.get(i).getSuffixQR());
+                eventId.add(qr.getEvent().getId());
+                adminService.statisticStop(qr.getEvent().getId());
             }
             if (qr == null) {
-                throw new IOException("Передали пустой файл!");
+                throw new IOException("Передали файл с несуществующим qr-Кодом!");
             } else {
                 qr.setResources(addCustomResource(qr,propResources.get(i)));
                 qrRepository.save(qr);
             }
-
+        }
+        for (Long id : eventId) {
+            adminService.statisticStart(id);
         }
     }
 
@@ -117,7 +124,7 @@ public class CSVFilesServiceImpl implements CSVFilesService {
     }
 
     private void generateTemplateForPath(String resourcePath, CSVResourceModel resourceModel) {
-        Page page = new Page(resourcePath,resourceModel.getMessageResource());
+        Page page = new Page(resourcePath,resourceModel.getMessageResource(),resourceModel.getSuffixQR());
         pageRepository.save(page);
     }
 }

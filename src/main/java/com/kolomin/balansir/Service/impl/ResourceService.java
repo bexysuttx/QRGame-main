@@ -33,6 +33,10 @@ public class ResourceService {
         }
     }
 
+    public void deleteAll(Iterable<Resource> resources) {
+        resourceRepository.deleteAll(resources);
+    }
+
     public Resource getByQRSuffixNotDeletedAndCamePeopleCountMin(String path) {
         return resourceRepository.getByQRSuffixNotDeletedAndCamePeopleCountMin(path);
     }

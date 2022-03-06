@@ -50,6 +50,8 @@ $(document).ready(function(){
 				Data.append('file', file);
 			};
 		});
+		$('#loadMoreContainer').css('display', 'none');
+        $('#loadMoreIndicator').css('display', 'block');
 
 		$.ajax({
 			url: dropZone.attr('action'),
@@ -58,10 +60,14 @@ $(document).ready(function(){
 			contentType: false,
 			processData: false,
 			success: function(data) {
+			    $('#loadMoreIndicator').css('display', 'none');
+                $('#loadMoreContainer').css('display', 'block');
 				alert ('Файлы были успешно загружены!');
 			},
 			error: function(data) {
-            				alert ('Ошибка при загрузке файла! Попробуйте снова.');
+			    $('#loadMoreIndicator').css('display', 'none');
+                $('#loadMoreContainer').css('display', 'block');
+            	alert ('Ошибка при загрузке файла! Попробуйте снова.');
             }
 		});
 	}

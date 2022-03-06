@@ -94,6 +94,15 @@ html, body {
 	outline-offset: -17px;
 }
 
+#custom {
+	background-color: #333333;
+	color: #FFFFFF;
+}
+
+#custom-text {
+	color: #FFFFFF;
+}
+
 
 
 

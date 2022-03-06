@@ -2,12 +2,15 @@ package com.kolomin.balansir.Controller.Admin;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
+import com.kolomin.balansir.Entity.Page;
+import com.kolomin.balansir.Service.PageService;
 import com.kolomin.balansir.Service.impl.UserService;
 import com.kolomin.balansir.Service.impl.AdminService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -27,12 +30,14 @@ public class AdminController {
 
     private AdminService adminService;
     private UserService userService;
+    private PageService pageService;
 
     @Autowired
-    public AdminController(AdminService adminService, UserService userService) {
+    public AdminController(AdminService adminService, UserService userService, PageService pageService) {
         java.util.TimeZone.setDefault(java.util.TimeZone.getTimeZone("GMT+3"));
         this.adminService = adminService;
         this.userService = userService;
+        this.pageService=pageService;
     }
 
     /**
@@ -324,6 +329,25 @@ public class AdminController {
         } else {
             return ResponseEntity.status(401).build();
         }
+    }
+
+    @GetMapping("/gms")
+    public ResponseEntity getMessageForCustomUrl(HttpEntity<String> rq,@RequestParam("suffix") String suffix) {
+        if (userService.chekToken(rq)) {
+            log.debug("Запрос на содержимое кастомных страниц");
+            return ResponseEntity.ok(pageService.getMessages(suffix).toString());
+        } else {
+            return ResponseEntity.status(401).build();
+        }
+    }
+    @PostMapping("/edit/msg")
+    public ResponseEntity editMessageForCustomUrl(HttpEntity<String> rq) {
+      //  if (userService.chekToken(rq)) {
+            log.debug("Запрос на содержимое кастомных страниц");
+            return ResponseEntity.ok(pageService.editMessage(rq));
+       // } else {
+       //     return ResponseEntity.status(401).build();
+       // }
     }
 
 }

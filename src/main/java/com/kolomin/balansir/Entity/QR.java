@@ -58,8 +58,8 @@ public class QR {
     @Column
     private boolean personal_access;
 
-    @OneToMany(mappedBy = "qr", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    @OrderBy("id ASC")
+    @OneToMany(mappedBy = "qr", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OrderBy("number ASC")
     private List<Resource> resources;
 
     @OneToMany(mappedBy = "qr", fetch = FetchType.LAZY, cascade = CascadeType.ALL)

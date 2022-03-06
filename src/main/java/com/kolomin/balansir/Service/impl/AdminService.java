@@ -45,6 +45,7 @@ public class AdminService {
     public static final String CYRILLIC_TO_LATIN = "Cyrillic-Latin; Latin-ASCII";
     Transliterator toLatinTrans;
 
+
     public static Hashtable<String, Long> resource_people_count;
     public static Hashtable<String, Long> resource_came_people_count;
     public static Hashtable<String, Boolean> resource_deleted;
@@ -270,16 +271,19 @@ public class AdminService {
 //                }
                 newResource.setQr(newQR);
                 newResource.setQr_suffix(newQR.getQr_suffix());
-                if (resource.getAsJsonObject().get("people_count").toString().replaceAll("\"","").equals("")){
+                String peopleCount = resource.getAsJsonObject().get("people_count").toString().replaceAll("\"","");
+                if (peopleCount.equals("")){
                     newResource.setInfinity(true);
                     newResource.setPeople_count(0L);
                 } else {
                     newResource.setInfinity(false);
-                    newResource.setPeople_count(Long.valueOf(resource.getAsJsonObject().get("people_count").toString().replaceAll("\"","")));
+                    newResource.setPeople_count(Long.valueOf(peopleCount));
                 }
                 newResource.setUrl(resource.getAsJsonObject().get("url").toString().replaceAll("\"",""));
                 newResource.setCame_people_count(0L);
-                newResource.setDeleted(false);
+                if (peopleCount.equals("0")) {
+                   newResource.setDeleted(true);
+                }
                 newResource.setName(resource.getAsJsonObject().get("name").toString().replaceAll("\"",""));
                 newResource.setNumber(Integer.parseInt(resource.getAsJsonObject().get("number").toString().replaceAll("\"","")));
                 resources.add(newResource);
@@ -455,14 +459,15 @@ public class AdminService {
                             response += ",\"errorText\": \"Ресурс " + resource.getAsJsonObject().get("url").toString().replaceAll("\"", "") + " уже существует. Данный ресурс не добавился\",\n";
                             continue;
                         }
+                        String peopleCount = resource.getAsJsonObject().get("people_count").toString().replaceAll("\"", "");
                         newResource.setQr(oldQR);
                         newResource.setQr_suffix(oldQR.getQr_suffix());
-                        if (resource.getAsJsonObject().get("people_count").toString().replaceAll("\"", "").equals("")) {
+                        if (peopleCount.equals("")) {
                             newResource.setInfinity(true);
                             newResource.setPeople_count(0L);
                         } else {
                             newResource.setInfinity(false);
-                            newResource.setPeople_count(Long.valueOf(resource.getAsJsonObject().get("people_count").toString().replaceAll("\"", "")));
+                            newResource.setPeople_count(Long.valueOf(peopleCount));
                         }
                         newResource.setUrl(resource.getAsJsonObject().get("url").toString().replaceAll("\"", ""));
                         newResource.setCame_people_count(0L);
@@ -470,8 +475,9 @@ public class AdminService {
                         newResource.setNumber(Integer.parseInt(resource.getAsJsonObject().get("number").toString().replaceAll("\"","")));
                         if (oldQR.isDeleted()){
                             newResource.setDeleted(true);
-                        } else {
-                            newResource.setDeleted(false);
+                        }
+                        if (peopleCount.equals("0")) {
+                            newResource.setDeleted(true);
                         }
 
                         resources.add(newResource);
@@ -485,7 +491,7 @@ public class AdminService {
                     if (!oldQR.getResources().contains(newResource))
                         oldQR.getResources().add(newResource);
                 }
-
+                oldQR.setResources(resources);
                 qrService.saveOrUpdate(oldQR);
             }
             else {    //  если не существующий код
@@ -557,21 +563,23 @@ public class AdminService {
                         response += ",\"errorText\": \"Ресурс " + resource.getAsJsonObject().get("url").toString().replaceAll("\"", "") + " уже существует. Данный ресурс не добавился\",\n";
                         continue;
                     }
+                    String peopleCount =resource.getAsJsonObject().get("people_count").toString().replaceAll("\"", "");
                     newResource.setQr(newQR);
                     newResource.setQr_suffix(newQR.getQr_suffix());
-                    if (resource.getAsJsonObject().get("people_count").toString().replaceAll("\"", "").equals("")) {
+                    if (peopleCount.equals("")) {
                         newResource.setInfinity(true);
                         newResource.setPeople_count(0L);
                     } else {
                         newResource.setInfinity(false);
-                        newResource.setPeople_count(Long.valueOf(resource.getAsJsonObject().get("people_count").toString().replaceAll("\"", "")));
+                        newResource.setPeople_count(Long.valueOf(peopleCount));
                     }
                     newResource.setUrl(resource.getAsJsonObject().get("url").toString().replaceAll("\"", ""));
                     newResource.setCame_people_count(0L);
                     if (newQR.isDeleted()) {
                         newResource.setDeleted(true);
-                    } else {
-                        newResource.setDeleted(false);
+                    }
+                    if (peopleCount.equals("0")) {
+                        newResource.setDeleted(true);
                     }
                     newResource.setName(resource.getAsJsonObject().get("name").toString().replaceAll("\"",""));
                     newResource.setNumber(Integer.parseInt(resource.getAsJsonObject().get("number").toString().replaceAll("\"","")));

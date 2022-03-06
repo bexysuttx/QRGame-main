@@ -71,7 +71,7 @@ public class BalansirController {
        }
     }
 
-    @GetMapping("/p/{path}")
+    @GetMapping("/b/{path}")
     public String getPage(@PathVariable String path, Model model, HttpServletRequest request) {
 
         model.addAttribute("message",pageService.getMessageByUrl(request.getRequestURI()));
@@ -96,8 +96,9 @@ public class BalansirController {
                     if (resource != null) {
                         Long Came_people_count = resource_came_people_count.get(resource);
                         if (!resource_infinity.get(resource)) {
-                            if (Came_people_count + 1 == resource_people_count.get(resource))
+                            if (Came_people_count + 1 == resource_people_count.get(resource)) {
                                 resource_deleted.put(resource, true);
+                            }
                         }
                         resource_came_people_count.put(resource, Came_people_count + 1);
                         return resource;

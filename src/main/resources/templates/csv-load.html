@@ -27,12 +27,18 @@
                             <i class="glyphicon glyphicon-share"></i> Добавьте .csv файл:
                         </h2>
                         <div class="col-md-6 col-md-offset-3">
+
                         <form id="upload-container" enctype="multipart/form-data" action="/admin/loadCsv" method="post">
+                            <div id="loadMoreIndicator" class="col-xs-12 text-center" style="display:none;">
+                                <img src="/img/loading.gif" alt="loading..."/>
+                            </div>
+                            <div id="loadMoreContainer">
                             <img id="upload-image" src="/img/upload.svg">
                             <div>
                                 <input id="file-input" type="file" name="file" multiple>
                                 <label for="file-input">Выберите файл</label>
                                 <span>или перетащите его сюда</span>
+                            </div>
                             </div>
                         </form>
                         </div>
