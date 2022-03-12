@@ -46,6 +46,9 @@ public class Resource {
     @Column
     private boolean deleted;
 
+    @Column
+    private boolean team;
+
     public Resource() {}
 
     public Resource(QR qr, String qr_suffix, String url) {
@@ -66,6 +69,7 @@ public class Resource {
                 "\t\t\t\t\t\"number\": \"" + number + "\",\n" +
                 "\t\t\t\t\t\"people_count\": \"" + people_count + "\",\n" +
                 "\t\t\t\t\t\"came_people_count\": \"" + came_people_count + "\",\n" +
+                "\t\t\t\t\t\"isCommand\": " + team + ",\n" +
                 "\t\t\t\t\t\"deleted\": " + deleted + "\n" +
                 "\t\t\t\t}";
     }

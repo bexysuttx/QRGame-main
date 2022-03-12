@@ -50,8 +50,9 @@ public class AdminService {
     public static Hashtable<String, Long> resource_came_people_count;
     public static Hashtable<String, Boolean> resource_deleted;
     public static Hashtable<String, Boolean> resource_infinity;
-    public static Hashtable<String, ArrayList<String>> qr_resources;
+    public static Hashtable<String, Deque<String>> qr_resources;
     public static Hashtable<String, Boolean> qr_team;
+    public static Hashtable<String,Boolean> resource_team;
     public static Hashtable<String, String> qr_defaultResource;
     public static Hashtable<String, Long> qr_default_count;
     public static Hashtable<String, Long> qr_general_default_count;
@@ -74,6 +75,7 @@ public class AdminService {
         this.resource_came_people_count = new Hashtable<>();
         this.resource_deleted = new Hashtable<>();
         this.resource_infinity = new Hashtable<>();
+        this.resource_team=new Hashtable<>();
         this.qr_resources = new Hashtable<>();
         this.qr_team = new Hashtable<>();
         this.qr_default_count = new Hashtable<>();
@@ -286,6 +288,11 @@ public class AdminService {
                 }
                 newResource.setName(resource.getAsJsonObject().get("name").toString().replaceAll("\"",""));
                 newResource.setNumber(Integer.parseInt(resource.getAsJsonObject().get("number").toString().replaceAll("\"","")));
+                 if (resource.getAsJsonObject().get("isCommand").toString().equals("true")) {
+                    newResource.setTeam(true);
+                } else {
+                    newResource.setTeam(false);
+                }
                 resources.add(newResource);
 
 //                resourceService.saveOrUpdate(newResource);
@@ -451,6 +458,11 @@ public class AdminService {
 //                        oldResource.setDeleted(false);
                         oldResource.setName(resource.getAsJsonObject().get("name").toString().replaceAll("\"",""));
                         oldResource.setNumber(Integer.parseInt(resource.getAsJsonObject().get("number").toString().replaceAll("\"","")));
+                        if (resource.getAsJsonObject().get("isCommand").toString().equals("true")) {
+                            oldResource.setTeam(true);
+                        } else {
+                            oldResource.setTeam(false);
+                        }
                         resources.add(oldResource);
 
                     } else {
@@ -479,7 +491,11 @@ public class AdminService {
                         if (peopleCount.equals("0")) {
                             newResource.setDeleted(true);
                         }
-
+                        if (resource.getAsJsonObject().get("isCommand").toString().equals("true")) {
+                            newResource.setTeam(true);
+                        } else {
+                            newResource.setTeam(false);
+                        }
                         resources.add(newResource);
 
                     }
@@ -583,6 +599,11 @@ public class AdminService {
                     }
                     newResource.setName(resource.getAsJsonObject().get("name").toString().replaceAll("\"",""));
                     newResource.setNumber(Integer.parseInt(resource.getAsJsonObject().get("number").toString().replaceAll("\"","")));
+                    if (resource.getAsJsonObject().get("isCommand").toString().equals("true")) {
+                        newResource.setTeam(true);
+                    } else {
+                        newResource.setTeam(false);
+                    }
                     resources.add(newResource);
                 }
 
@@ -886,13 +907,21 @@ public class AdminService {
                     qr_default_count.put(qr.getQr_suffix(), qr.getDefault_resource_people_count());
                 }
             }
-            qr_resources.put(qr.getQr_suffix(), new ArrayList<>());
+            qr_resources.put(qr.getQr_suffix(), new ArrayDeque<>());
             for (Resource res:qr.getResources()) {
                 resource_people_count.put(res.getUrl(), res.getPeople_count());
                 resource_came_people_count.put(res.getUrl(), res.getCame_people_count());
-                resource_deleted.put(res.getUrl(),res.isDeleted());
-                resource_infinity.put(res.getUrl(), res.isInfinity());
-                qr_resources.get(qr.getQr_suffix()).add(res.getUrl());
+                if (res.isDeleted()) {
+                    resource_deleted.put(res.getUrl(), res.isDeleted());
+                } else {
+                    qr_resources.get(qr.getQr_suffix()).add(res.getUrl());
+                }
+                if (res.isInfinity()) {
+                    resource_infinity.put(res.getUrl(), res.isInfinity());
+                }
+                if (res.isTeam()) {
+                    resource_team.put(res.getUrl(),res.isTeam());
+                }
             }
         }
         System.out.println("qr_team = " + qr_team);
@@ -910,6 +939,7 @@ public class AdminService {
         System.out.println("resource_came_people_count = " + resource_came_people_count);
         System.out.println("resource_deleted = " + resource_deleted);
         System.out.println("resource_infinity = " + resource_infinity);
+        System.out.println("resource_team = " + resource_team);
         return "\"success\": true, \"text\": \"Создали мапу для работы балансира\"";
     }
 
@@ -934,6 +964,9 @@ public class AdminService {
                     }
                     if (resource_infinity.containsKey(r.getUrl())) {
                         resource_infinity.remove(r.getUrl());
+                    }
+                    if (resource_team.containsKey(r.getUrl())) {
+                        resource_team.remove(r.getUrl());
                     }
                 }
             }

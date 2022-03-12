@@ -94,13 +94,19 @@ public class BalansirController {
                 try {
                     String resource = getResource(path);
                     if (resource != null) {
-                        Long Came_people_count = resource_came_people_count.get(resource);
-                        if (!resource_infinity.get(resource)) {
-                            if (Came_people_count + 1 == resource_people_count.get(resource)) {
+                        Long Came_people_count = resource_came_people_count.get(resource)+1;
+                        resource_came_people_count.put(resource, Came_people_count);
+                        if (!resource_infinity.containsKey(resource)) {
+                            if (Came_people_count == resource_people_count.get(resource)) {
                                 resource_deleted.put(resource, true);
+                                //ЗАТюнить, вызывается get 2 раза
+                                if (qr_team.get(path) || resource_team.containsKey(resource)) {
+                                    qr_resources.get(path).pollLast();
+                                } else {
+                                    qr_resources.get(path).pollFirst();
+                                }
                             }
                         }
-                        resource_came_people_count.put(resource, Came_people_count + 1);
                         return resource;
                     } else {
                         qr_default_count.put(path, qr_default_count.get(path) + 1);
@@ -124,22 +130,14 @@ public class BalansirController {
         String resourceUrl = null;
         try{
             if (qr_team.get(path)){
-                Long camePeopleCount = 10000000000L;
-                for (String resUrl: qr_resources.get(path)) {
-                    if (!resource_deleted.get(resUrl)){
-                        if (resource_came_people_count.get(resUrl) < camePeopleCount){
-                            resourceUrl = resUrl;
-                            camePeopleCount = resource_came_people_count.get(resUrl);
-                        }
-                    }
-                }
+                resourceUrl=qr_resources.get(path).pollFirst();
+                qr_resources.get(path).addLast(resourceUrl);
             }
             else {
-                for (String resUrl: qr_resources.get(path)) {
-                    if (!resource_deleted.get(resUrl)){
-                        resourceUrl = resUrl;
-                        break;
-                    }
+                resourceUrl=qr_resources.get(path).peekFirst();
+                if (resource_team.containsKey(resourceUrl)) {
+                    qr_resources.get(path).addLast(resourceUrl);
+                    qr_resources.get(path).pollFirst();
                 }
             }
             return resourceUrl;
