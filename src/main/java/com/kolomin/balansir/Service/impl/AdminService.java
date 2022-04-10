@@ -60,7 +60,6 @@ public class AdminService {
     public static Hashtable<String,Hashtable<String,Integer>> qr_personal_password;
     public static Hashtable<String, Boolean> qr_personal_access;
 
-    public static Hashtable<String, LinkChat> link_chats;
 
     @Autowired
     public AdminService(EventSevice eventSevice, QRService qrService, ResourceService resourceService, QRGenerate qrGenerate) {
