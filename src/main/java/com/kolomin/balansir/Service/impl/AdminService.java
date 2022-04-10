@@ -3,10 +3,7 @@ package com.kolomin.balansir.Service.impl;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.ibm.icu.text.Transliterator;
-import com.kolomin.balansir.Entity.Event;
-import com.kolomin.balansir.Entity.PersonalPassword;
-import com.kolomin.balansir.Entity.QR;
-import com.kolomin.balansir.Entity.Resource;
+import com.kolomin.balansir.Entity.*;
 import com.kolomin.balansir.Model.QRPersonalAccessModel;
 import com.kolomin.balansir.Util.DataUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -62,6 +59,8 @@ public class AdminService {
 
     public static Hashtable<String,Hashtable<String,Integer>> qr_personal_password;
     public static Hashtable<String, Boolean> qr_personal_access;
+
+    public static Hashtable<String, LinkChat> link_chats;
 
     @Autowired
     public AdminService(EventSevice eventSevice, QRService qrService, ResourceService resourceService, QRGenerate qrGenerate) {
@@ -288,8 +287,12 @@ public class AdminService {
                 }
                 newResource.setName(resource.getAsJsonObject().get("name").toString().replaceAll("\"",""));
                 newResource.setNumber(Integer.parseInt(resource.getAsJsonObject().get("number").toString().replaceAll("\"","")));
-                 if (resource.getAsJsonObject().get("isCommand").toString().equals("true")) {
-                    newResource.setTeam(true);
+                if (resource.getAsJsonObject().has("isCommand")) {
+                    if (resource.getAsJsonObject().get("isCommand").toString().equals("true")) {
+                        newResource.setTeam(true);
+                    } else {
+                        newResource.setTeam(false);
+                    }
                 } else {
                     newResource.setTeam(false);
                 }
@@ -458,8 +461,12 @@ public class AdminService {
 //                        oldResource.setDeleted(false);
                         oldResource.setName(resource.getAsJsonObject().get("name").toString().replaceAll("\"",""));
                         oldResource.setNumber(Integer.parseInt(resource.getAsJsonObject().get("number").toString().replaceAll("\"","")));
-                        if (resource.getAsJsonObject().get("isCommand").toString().equals("true")) {
-                            oldResource.setTeam(true);
+                        if (resource.getAsJsonObject().has("isCommand")) {
+                            if (resource.getAsJsonObject().get("isCommand").toString().equals("true")) {
+                                oldResource.setTeam(true);
+                            } else {
+                                oldResource.setTeam(false);
+                            }
                         } else {
                             oldResource.setTeam(false);
                         }
@@ -491,8 +498,12 @@ public class AdminService {
                         if (peopleCount.equals("0")) {
                             newResource.setDeleted(true);
                         }
-                        if (resource.getAsJsonObject().get("isCommand").toString().equals("true")) {
-                            newResource.setTeam(true);
+                        if (resource.getAsJsonObject().has("isCommand")) {
+                            if (resource.getAsJsonObject().get("isCommand").toString().equals("true")) {
+                                newResource.setTeam(true);
+                            } else {
+                                newResource.setTeam(false);
+                            }
                         } else {
                             newResource.setTeam(false);
                         }
@@ -599,8 +610,12 @@ public class AdminService {
                     }
                     newResource.setName(resource.getAsJsonObject().get("name").toString().replaceAll("\"",""));
                     newResource.setNumber(Integer.parseInt(resource.getAsJsonObject().get("number").toString().replaceAll("\"","")));
-                    if (resource.getAsJsonObject().get("isCommand").toString().equals("true")) {
-                        newResource.setTeam(true);
+                    if (resource.getAsJsonObject().has("isCommand")) {
+                        if (resource.getAsJsonObject().get("isCommand").toString().equals("true")) {
+                            newResource.setTeam(true);
+                        } else {
+                            newResource.setTeam(false);
+                        }
                     } else {
                         newResource.setTeam(false);
                     }
